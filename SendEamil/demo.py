@@ -5,6 +5,7 @@ import time
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
+from GenerateText import generate
 
 
 root = tkinter.Tk()
@@ -49,9 +50,7 @@ def send():
     pwd = entryPwd.get()
     mailbox1 = entrymailbox1.get()
     try: 
-        text = '''
-        <p>Python 邮件发送测试...</p>
-        <p><a href="http://www.baidu.com">这是一个链接</a></p>'''
+        text = generate('2018-11-08')
         msg = MIMEText(text, 'html', 'utf-8')
         msg['From'] = formataddr(["Summer", mailbox])  # 发件人邮箱昵称、发件人邮箱账号
         msg['To'] = formataddr(["hello", mailbox1])  # 收件人邮箱昵称、收件人邮箱账号
