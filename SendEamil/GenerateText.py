@@ -1,9 +1,8 @@
-import datetime
+
 import Conn
 
 conn = Conn.SQLServer('localhost','sa','123456','FTJXBusDb')
- # time = str(datetime.date.today())
-time = '2018-11-08'
+
 
 
 def getSaleOrdersCountAndPrice(time):
@@ -50,14 +49,17 @@ def getPaysAndBills(time):
 
     
 def generate(time):
+    '''
+    生成邮件内容
+    '''
     order = getSaleOrdersCountAndPrice(time)
     purchase = getPurchaseCountAndPrice(time)
     billpay = getPaysAndBills(time)
-    text = '''时间：{0}<br/>今日销售订单情况<br/>共{1}单，合计金额{2}元。
-    <br>今日采购情况订单<br/>共{3}单，合计金额{4}元。<br/>
-    今日收付款情况<br/>合计收款金额{5}，合计付款金额{6}。
+    text = '''时间：{0}<br/>今日销售订单情况<br/>共<a color='red'>{1}</a>单，合计金额<a color='red'>{2}</a>元。
+    <br>今日采购情况订单<br/>共<a color='red'>{3}</a>单，合计金额<a color='red'>{4}</a>元。<br/>
+    今日收付款情况<br/>合计收款金额<a color='red'>{5}</a>元，合计付款金额<a color='red'>{6}</a>元。
     '''.format(time,order[0],order[1],purchase[0],purchase[1],billpay[0],billpay[1])
     return text
 
-print(generate(time))
+
     
