@@ -49,7 +49,7 @@ def send():
     mailbox1 = entrymailbox1.get()
     try: 
         # time = str(datetime.date.today())
-        time = '2018-11-08'
+        time = '2019-01-30'
         text = generate(time)
         msg = MIMEText(text, 'html', 'utf-8')
         msg['From'] = formataddr(["admin", mailbox])  # 发件人邮箱昵称、发件人邮箱账号
