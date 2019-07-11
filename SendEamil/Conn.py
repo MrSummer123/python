@@ -14,7 +14,11 @@ class SQLServer:
     # 得到数据库连接信息，返回conn.cursor()
         if not self.database:
             raise(NameError,"没有设置数据库信息")
-        self.conn = pymssql.connect(server=self.server,user=self.user,password=self.password,database=self.database)
+        try:
+            self.conn = pymssql.connect(server=self.server,user=self.user,password=self.password,database=self.database)
+        except:
+            raise(ConnectionError,"连接出错")
+        
         cur = self.conn.cursor()
         if not cur:
             raise(NameError,"连接数据库失败")  # 将DBC信息赋值给cur

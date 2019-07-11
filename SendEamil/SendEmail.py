@@ -46,18 +46,24 @@ def thread_it(func):
 def send():
     mailbox = entrymailbox.get()
     pwd = entryPwd.get()
-    mailbox1 = entrymailbox1.get()
+    ToMailBoxes = entrymailbox1.get()
+    ToMailBoxesList = ToMailBoxes.split(';')
     try: 
         # time = str(datetime.date.today())
-        time = '2019-01-30'
-        text = generate(time)
+        startTime = '{} 00:00:00'.format('2019-01-30')
+        endTime = '{} 23:59:59'.format('2019-02-28')
+        startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+        endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+        time = '{} 至 {}'.format(startTime.date(),endTime.date())
+
+        text = generate(startTime,endTime)
         msg = MIMEText(text, 'html', 'utf-8')
         msg['From'] = formataddr(["admin", mailbox])  # 发件人邮箱昵称、发件人邮箱账号
-        msg['To'] = formataddr(["admin", mailbox1])  # 收件人邮箱昵称、收件人邮箱账号
+        msg['To'] = formataddr(["admin", ToMailBoxes])  # 收件人邮箱昵称、收件人邮箱账号
         msg['Subject'] = "{}-报表".format(time)  # 邮件的主题
         server = smtplib.SMTP("smtp.126.com", 25)  # 发件人邮箱中的SMTP服务器，端口是25
         server.login(mailbox, pwd)  # 括号中对应的是发件人邮箱账号、邮箱密码
-        server.sendmail(mailbox, [mailbox1, ], msg.as_string())
+        server.sendmail(mailbox, ToMailBoxesList, msg.as_string())
         server.quit()
         tkinter.messagebox.showinfo(title='报告',message='发送成功...')
     except Exception:
