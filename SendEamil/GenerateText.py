@@ -151,7 +151,7 @@ def generate(startTime,endTime):
 # l = generate(startTime,endTime)
 # print(l)
 if __name__ == "__main__":
-    startTime = '{} 00:00:00'.format('2019-01-30')
+    startTime = '{} 00:00:00'.format('2019-02-28')
     endTime = '{} 23:59:59'.format('2019-02-28')
     startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
     endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
