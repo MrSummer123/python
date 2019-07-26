@@ -6,7 +6,7 @@ import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
-from GenerateText import generate
+from GenerateTextByDay import generate
 import schedule
 import time
 
