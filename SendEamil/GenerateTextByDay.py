@@ -150,17 +150,17 @@ def getOrderByReceived():
     and t2.IsDeleted = 0
     ORDER BY t1.OrderDate desc'''.format(RealTime)
     result = conn.ExecQuery(sql)
-    text ="<table width='100%' border='1' cellpadding='0' cellspacing='0' style='border-collapse:collapse;'> <tr><td>流水号</td><td>经办人</td><td>客户名</td><td>货币</td><td>账单金额</td><td>已收金额</td><td>待收金额</td><td>付款期限</td><td>已超期天数</td></tr>"
+    text ="<table width='100%' border='1' cellpadding='0' cellspacing='0' style='border-collapse:collapse;'> <tr><td>订单号</td><td>经办人</td><td>客户名</td><td>货币</td><td>账单金额</td><td>已收金额</td><td>待收金额</td><td>付款期限</td><td>已超期天数</td></tr>"
     for i in result:   
         text = text+"<tr>"
-        text=text+"<td>{}</td>".format(i[0]) #流水号
+        text=text+"<td>{}</td>".format(i[0]) #订单号
         text=text+"<td>{}</td>".format(i[1]) #经办人
         text=text+"<td>{}</td>".format(i[2]) #客户名
         text=text+"<td>{}</td>".format(i[3]) #货币
         text=text+"<td>{}</td>".format(i[4]) #账单金额
         text=text+"<td>{}</td>".format(i[5]) #已收金额
         text=text+"<td>{}</td>".format(i[6]) #待收金额
-        text=text+"<td>{}</td>".format(i[7]) #付款期限
+        text=text+"<td>{}</td>".format(i[7].strftime('%Y-%m-%d')) #付款期限
         text=text+"<td>{}</td>".format(i[8]) #已超期天数
         text+"</tr>"
     text =text+"</table>"
@@ -193,19 +193,19 @@ def getProductByDate():
     and (t2.PaymentMode = 1 or (t2.PaymentMode =0 and t8.BillReceivedAmount>0)) 
     order by t2.OrderDate desc, t2.OrderCode '''.format(RealTime)
     result = conn.ExecQuery(sql)
-    text ="<table width='100%' border='1' cellpadding='0' cellspacing='0' style='border-collapse:collapse;'> <tr><td>流水号</td><td>客户名</td><td>付款方式</td><td>经办人</td><td>产品号</td><td>商标名</td><td>订购数量</td><td>原价</td><td>已发数量</td><td>限期</td><td>已超期天数</td></tr>"
+    text ="<table width='100%' border='1' cellpadding='0' cellspacing='0' style='border-collapse:collapse;'> <tr><td>订单号</td><td>客户名</td><td>付款方式</td><td>经办人</td><td>产品号</td><td>商标名</td><td>订购数量</td><td>原价</td><td>已发数量</td><td>限期</td><td>已超期天数</td></tr>"
     for i in result:   
         text = text+"<tr>"
-        text=text+"<td>{}</td>".format(i[0]) #流水号
+        text=text+"<td>{}</td>".format(i[0]) #订单号
         text=text+"<td>{}</td>".format(i[1]) #客户名
         text=text+"<td>{}</td>".format(i[2]) #付款方式
         text=text+"<td>{}</td>".format(i[3]) #经办人
         text=text+"<td>{}</td>".format(i[4]) #产品号
         text=text+"<td>{}</td>".format(i[5]) #商标名
         text=text+"<td>{}</td>".format(i[6]) #订购数量
-        text=text+"<td>{}</td>".format(i[7]) #原价
+        text=text+"<td>{}</td>".format(round(i[7],2)) #原价
         text=text+"<td>{}</td>".format(i[8]) #已发数量
-        text=text+"<td>{}</td>".format(i[9]) #限期
+        text=text+"<td>{}</td>".format(i[9].strftime('%Y-%m-%d')) #限期
         text=text+"<td>{}</td>".format(i[10])  #已超期天数 
         text+"</tr>"
     text =text+"</table>"

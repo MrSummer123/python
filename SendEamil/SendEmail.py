@@ -7,6 +7,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
 from GenerateTextByDay import generate
+from GenerateTextByWeek import generateByWeek
 import schedule
 import time
 
@@ -52,15 +53,24 @@ entryEnd=tkinter.Entry(root,width=120,textvariable=varEnd)
 entryEnd.place(x=520,y=130,width=200,height=40)
 
 
-lableEvery=tkinter.Label(root,text='每日发送时间设置',justify=tkinter.CENTER,width=80,font='10')
-lableEvery.place(x=80,y=340,width=200,height=20)
+lableEveryDay=tkinter.Label(root,text='每日发送时间设置',justify=tkinter.LEFT,width=80,font='10')
+lableEveryDay.place(x=80,y=340,width=250,height=20)
 
-lableTime = tkinter.Label(root,text='每日时间:',justify=tkinter.RIGHT,width=80)
-lableTime.place(x=20,y=390,width=80,height=20)
+lableTime = tkinter.Label(root,text='如:07:00:',justify=tkinter.LEFT,width=200)
+lableTime.place(x=10,y=390,width=80,height=20)
 varTime=tkinter.StringVar(root,value='')
 entryTime=tkinter.Entry(root,width=120,textvariable=varTime)
 entryTime.place(x=120,y=380,width=200,height=40)
 
+
+lableEveryDay=tkinter.Label(root,text='每周发送时间设置',justify=tkinter.CENTER,width=80,font='10')
+lableEveryDay.place(x=450,y=340,width=250,height=20)
+
+lableWeekTime = tkinter.Label(root,text='如:19:00:',justify=tkinter.LEFT,width=80)
+lableWeekTime.place(x=410,y=390,width=80,height=20)
+varWeekTime=tkinter.StringVar(root,value='')
+entryWeekTime=tkinter.Entry(root,width=120,textvariable=varWeekTime)
+entryWeekTime.place(x=520,y=380,width=200,height=40)
 
 try:
     filename = 'info.txt'
@@ -80,14 +90,44 @@ def thread_it(func):
 
     
     
-def send(startTime,endTime,mailbox,pwd,ToMailBoxes):
+def send(flag,mailbox,pwd,ToMailBoxes):
     '''
     发送邮件
     '''
+    
+    today = datetime.date.today()
+
+
     ToMailBoxesList = ToMailBoxes.split(';')
-    try: 
-        time = '{} 至 {}'.format(startTime.date(),endTime.date())
-        text = generate(startTime,endTime)
+    try:   
+        if flag==1: #1为每天发送，2为每周发送，3为每月发送，4为手动自定义发送
+            
+            startTime = '{} 00:00:00'.format(today)
+            endTime = '{} 23:59:59'.format(today)
+            startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+            endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+            time = '{} 至 {}'.format(startTime.date(),endTime.date())
+            text = generate(startTime,endTime)
+        elif flag==2:
+            sunday = datetime.date.today()
+            one_day = datetime.timedelta(days=1)
+            while sunday.weekday() != 6:#找到本周周天
+                sunday += one_day
+            startTime = '{} 00:00:00'.format(sunday)
+            endTime = '{} 23:59:59'.format(sunday)
+            startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(days=7,hours=8)#间隔一周
+            endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+            text = generateByWeek(startTime,endTime)
+        elif flag==3:
+            pass
+        elif flag==4:
+            start = entryStart.get()
+            end = entryEnd.get()
+            startTime = '{} 00:00:00'.format(start)
+            endTime = '{} 23:59:59'.format(end)
+            startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+            endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+            text = generate(startTime,endTime)
         msg = MIMEText(text, 'html', 'utf-8')
         msg['From'] = formataddr(["admin", mailbox])  # 发件人邮箱昵称、发件人邮箱账号
         msg['To'] = formataddr(["boss", ToMailBoxes])  # 收件人邮箱昵称、收件人邮箱账号
@@ -123,19 +163,14 @@ def SendOnTime():
     '''
     根据手工设定的时间发送邮件
     '''
-    start = entryStart.get()
-    end = entryEnd.get()
-    startTime = '{} 00:00:00'.format(start)
-    endTime = '{} 23:59:59'.format(end)
-    startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
-    endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+    
     try:
         filename = 'info.txt'
         with open(filename,'r') as fp:
             mailFrom, pwd, mailTo = fp.read().strip().split(',')
     except:
         pass
-    send(startTime,endTime,mailFrom,pwd,mailTo)
+    send(4,mailFrom,pwd,mailTo)
 
 
 
@@ -150,18 +185,29 @@ def SendEmailEveryDay():
     工作日发送邮件
     '''
     Time = entryTime.get()
-    today = datetime.date.today()
-    startTime = '{} 00:00:00'.format(today)
-    endTime = '{} 23:59:59'.format(today)
-    startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
-    endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
     try:
         filename = 'info.txt'
         with open(filename,'r') as fp:
             mailFrom, pwd, mailTo = fp.read().strip().split(',')
     except:
         pass
-    schedule.every().day.at(Time).do(send,startTime,endTime, mailFrom, pwd, mailTo)
+    schedule.every().day.at(Time).do(send,1, mailFrom, pwd, mailTo)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+def SendEmailEveryWeek():
+    '''
+    每周发送邮件
+    '''
+    Time = entryWeekTime.get()   
+    try:
+        filename = 'info.txt'
+        with open(filename,'r') as fp:
+            mailFrom, pwd, mailTo = fp.read().strip().split(',')
+    except:
+        pass
+    schedule.every().sunday.at(Time).do(send,2, mailFrom, pwd, mailTo)
     while True:
         schedule.run_pending()
         time.sleep(1)
@@ -183,6 +229,9 @@ buttonSend.place(x=500,y=200,width=200,height=40)
 
 buttonTime=tkinter.Button(root,text='保存',command=lambda:thread_it(SendEmailEveryDay))
 buttonTime.place(x=80,y=500,width=200,height=40)
+
+buttonWeekTime=tkinter.Button(root,text='保存',command=lambda:thread_it(SendEmailEveryWeek))
+buttonWeekTime.place(x=480,y=500,width=200,height=40)
 
 
 
