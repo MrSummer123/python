@@ -6,8 +6,8 @@ import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
-from GenerateTextByDay import generate
-from GenerateTextByWeek import generateByWeek
+from GenerateSummeryForDay import generate
+from GenerateSummeryForWeek import generateByWeek
 import schedule
 import time
 
@@ -102,11 +102,9 @@ def send(flag,mailbox,pwd,ToMailBoxes):
     try:   
         if flag==1: #1为每天发送，2为每周发送，3为每月发送，4为手动自定义发送
             
-            startTime = '{} 00:00:00'.format(today)
-            endTime = '{} 23:59:59'.format(today)
-            startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
-            endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
-            time = '{} 至 {}'.format(startTime.date(),endTime.date())
+            startTime = '{}'.format(today)
+            endTime = '{}'.format(today)
+            time = '{} 至 {}'.format(startTime,endTime)
             text = generate(startTime,endTime)
         elif flag==2:
             sunday = datetime.date.today()
@@ -117,16 +115,14 @@ def send(flag,mailbox,pwd,ToMailBoxes):
             endTime = '{} 23:59:59'.format(sunday)
             startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(days=7,hours=8)#间隔一周
             endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+            time = '{} 至 {}'.format(startTime,endTime)
             text = generateByWeek(startTime,endTime)
         elif flag==3:
             pass
         elif flag==4:
-            start = entryStart.get()
-            end = entryEnd.get()
-            startTime = '{} 00:00:00'.format(start)
-            endTime = '{} 23:59:59'.format(end)
-            startTime = datetime.datetime.strptime(startTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
-            endTime = datetime.datetime.strptime(endTime,'%Y-%m-%d  %H:%M:%S')-datetime.timedelta(hours=8)
+            startTime = entryStart.get()
+            endTime = entryEnd.get()
+            time = '{} 至 {}'.format(startTime,endTime)
             text = generate(startTime,endTime)
         msg = MIMEText(text, 'html', 'utf-8')
         msg['From'] = formataddr(["admin", mailbox])  # 发件人邮箱昵称、发件人邮箱账号
@@ -248,4 +244,3 @@ root.columnconfigure(3,weight=1)
 root.rowconfigure(3,weight=1)
 
 root.mainloop()
-
